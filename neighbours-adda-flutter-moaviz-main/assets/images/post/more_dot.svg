@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <g id="more-dots-icon" transform="translate(6137 3259)">
+    <g id="Rectangle_12142" data-name="Rectangle 12142" transform="translate(-6137 -3259)" fill="#fff" stroke="#707070" stroke-width="1" opacity="0">
+      <rect width="100" height="100" stroke="none"/>
+      <rect x="0.5" y="0.5" width="99" height="99" fill="none"/>
+    </g>
+    <g id="Group_62900" data-name="Group 62900" transform="translate(-6451.857 -3518.688)">
+      <g id="Ellipse_3173" data-name="Ellipse 3173" transform="translate(322 298)" fill="#fff" stroke="#001968" stroke-width="5">
+        <circle cx="11.688" cy="11.688" r="11.688" stroke="none"/>
+        <circle cx="11.688" cy="11.688" r="9.188" fill="none"/>
+      </g>
+      <g id="Ellipse_3174" data-name="Ellipse 3174" transform="translate(353.169 298)" fill="#fff" stroke="#001968" stroke-width="5">
+        <circle cx="11.688" cy="11.688" r="11.688" stroke="none"/>
+        <circle cx="11.688" cy="11.688" r="9.188" fill="none"/>
+      </g>
+      <g id="Ellipse_3175" data-name="Ellipse 3175" transform="translate(384.338 298)" fill="#fff" stroke="#001968" stroke-width="5">
+        <circle cx="11.688" cy="11.688" r="11.688" stroke="none"/>
+        <circle cx="11.688" cy="11.688" r="9.188" fill="none"/>
+      </g>
+    </g>
+  </g>
+</svg>

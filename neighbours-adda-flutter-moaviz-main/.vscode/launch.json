@@ -1,0 +1,65 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "neighbours-adda-flutter",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "neighbours-adda-flutter (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "neighbours-adda-flutter (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "designer",
+            "cwd": "packages\\designer",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "designer (profile mode)",
+            "cwd": "packages\\designer",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "designer (release mode)",
+            "cwd": "packages\\designer",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "internet_handler",
+            "cwd": "packages\\internet_handler",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "internet_handler (profile mode)",
+            "cwd": "packages\\internet_handler",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "internet_handler (release mode)",
+            "cwd": "packages\\internet_handler",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

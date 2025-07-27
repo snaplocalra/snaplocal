@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="12.538" height="12.538" viewBox="0 0 12.538 12.538">
+  <g id="locate_me" transform="translate(-349.95 -37.65)">
+    <g id="Ellipse_3256" data-name="Ellipse 3256" transform="translate(351.705 39.405)">
+      <g id="Group_61089" data-name="Group 61089">
+        <circle id="Ellipse_3260" data-name="Ellipse 3260" cx="5" cy="5" r="5" transform="translate(-0.486 -0.486)" fill="none"/>
+      </g>
+    </g>
+    <g id="Line_480" data-name="Line 480" transform="translate(350.2 37.9)">
+      <path id="Path_69457" data-name="Path 69457" d="M361.425,43.166a5.267,5.267,0,0,0-4.454-4.454V37.9h-1.5v.813A5.138,5.138,0,0,0,352.5,40.2a4.087,4.087,0,0,0-.346.376,5.527,5.527,0,0,0-.572.843,4.692,4.692,0,0,0-.391.933,3.945,3.945,0,0,0-.181.813H350.2v1.5h.813a3.945,3.945,0,0,0,.181.813,4.692,4.692,0,0,0,.391.933,5.527,5.527,0,0,0,.572.843,4.087,4.087,0,0,0,.346.376,5.138,5.138,0,0,0,2.964,1.49v.813h1.5v-.813a5.267,5.267,0,0,0,4.454-4.454h.813v-1.5Zm-5.206,5.266a4.514,4.514,0,1,1,4.514-4.514A4.518,4.518,0,0,1,356.219,48.433Z" transform="translate(-350.2 -37.9)" fill="#001968" stroke="#001968" stroke-width="0.5"/>
+    </g>
+    <g id="Ellipse_3257" data-name="Ellipse 3257" transform="translate(355.078 42.779)">
+      <g id="Group_61090" data-name="Group 61090">
+        <circle id="Ellipse_3261" data-name="Ellipse 3261" cx="1.137" cy="1.137" r="1.137" fill="#001968"/>
+      </g>
+    </g>
+  </g>
+</svg>

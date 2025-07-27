@@ -1,0 +1,127 @@
+{
+  "project_info": {
+    "project_number": "645560434000",
+    "project_id": "neighboursadda-11bb0",
+    "storage_bucket": "neighboursadda-11bb0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645560434000:android:b9c9a10355f1cd7df1c055",
+        "android_client_info": {
+          "package_name": "com.na.snaplocal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645560434000-0rs1ap92uqqvdpu22iktjrv55adp19c1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "0879ae2f00803db280c2b374bbe67b14c030fc18"
+          }
+        },
+        {
+          "client_id": "645560434000-1afociinil64mmq34jphvokdsap92d8c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "d31a7ffc1e2f790dd2d58ea0366bb353a64dd848"
+          }
+        },
+        {
+          "client_id": "645560434000-3ok2f5o6mt5lnoertf4aeffbu53mkmue.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "cecac888c877fa4366f0f49e5cf2759ff5faf509"
+          }
+        },
+        {
+          "client_id": "645560434000-8ung4eabsafdbo5nso6l89sei4cinccg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "12dd1c21f47791b7ffdf019aa33f93a4483d10db"
+          }
+        },
+        {
+          "client_id": "645560434000-ad1dvqu0grbsi0jmh8e6fkut8t7jtbvs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "f61a3a3bcfe48caf5abd154e14a0d95a104bead0"
+          }
+        },
+        {
+          "client_id": "645560434000-b19b8u8b8cp3qh4r40mlnn7087o3s8v2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "0384cb1a24f1b88f502f134066c2a65430f826e2"
+          }
+        },
+        {
+          "client_id": "645560434000-e56oo8189vesogae0e67npo6d2a3khp7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "62f91e301cf98e20918fcb0b011764d5d7aa0389"
+          }
+        },
+        {
+          "client_id": "645560434000-h856fttvuc0l15jit2j446ljopnjlj3j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "dc9c8986d740510ebb1bebd895db71e60a370c10"
+          }
+        },
+        {
+          "client_id": "645560434000-jcgkavagv8adm6ou6kks8r9hjoknesdo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "dfd909449e17ae4bf24d6c3e59e95b58fd4ffe22"
+          }
+        },
+        {
+          "client_id": "645560434000-ne29g9v24l0e3stlcu28mi70a230vutj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.na.snaplocal",
+            "certificate_hash": "d4b7669fee46d63b2e9fc96501792837efd36239"
+          }
+        },
+        {
+          "client_id": "645560434000-ia4smq4gtepp9m0gpv0oalbtrj2ctnbd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClHRkMWy_BFEpyfSDotfOVhc1JjkxjmHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "645560434000-ia4smq4gtepp9m0gpv0oalbtrj2ctnbd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "645560434000-08v39h71mku3fkcrp1gp5fhnihrolimv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cm.neighboursadda",
+                "app_store_id": "6451350657"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

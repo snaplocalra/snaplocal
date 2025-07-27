@@ -1,0 +1,22 @@
+<svg id="smile-face" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="248.817" height="248.817" viewBox="0 0 248.817 248.817">
+  <defs>
+    <radialGradient id="radial-gradient" cx="0.573" cy="0.502" r="0.5" gradientTransform="matrix(0.008, 1, -1, 0.008, 0.926, -0.079)" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#fddb35"/>
+      <stop offset="0.482" stop-color="#fcd934"/>
+      <stop offset="0.655" stop-color="#fcd232"/>
+      <stop offset="0.779" stop-color="#fbc62e"/>
+      <stop offset="0.879" stop-color="#f9b528"/>
+      <stop offset="0.964" stop-color="#f89f21"/>
+      <stop offset="1" stop-color="#f7941e"/>
+    </radialGradient>
+  </defs>
+  <ellipse id="Ellipse_3399" data-name="Ellipse 3399" cx="123.462" cy="123.462" rx="123.462" ry="123.462" transform="translate(0 246.917) rotate(-89.559)" fill="url(#radial-gradient)"/>
+  <path id="Path_70527" data-name="Path 70527" d="M517.378,215.306A123.464,123.464,0,0,1,321.555,315.339a131.934,131.934,0,0,0,193.011-116.9c0-3.966-.168-7.9-.533-11.784A123.364,123.364,0,0,1,517.378,215.306Z" transform="translate(-269.504 -90.886)" fill="#fbd69e" style="mix-blend-mode: multiply;isolation: isolate"/>
+  <path id="Path_70528" data-name="Path 70528" d="M381.681,228.771c-20.031,0-37.847-6.114-49.24-15.607a1.674,1.674,0,0,0-2.478,2.183c8.908,13.968,28.711,23.684,51.719,23.684s42.814-9.716,51.719-23.684a1.673,1.673,0,0,0-2.476-2.183C419.528,222.657,401.715,228.771,381.681,228.771Z" transform="translate(-257.274 -51.618)" fill="#87594a"/>
+  <g id="Group_62275" data-name="Group 62275" transform="translate(54.332 77.647)">
+    <ellipse id="Ellipse_3400" data-name="Ellipse 3400" cx="23.278" cy="24.073" rx="23.278" ry="24.073" fill="#87594a"/>
+    <ellipse id="Ellipse_3401" data-name="Ellipse 3401" cx="8.746" cy="8.746" rx="8.746" ry="8.746" transform="translate(14.532 5.996)" fill="#fff"/>
+    <path id="Path_70529" data-name="Path 70529" d="M406.408,203.486c0,13.3-10.422,24.074-23.278,24.074s-23.278-10.778-23.278-24.074,10.422-24.072,23.278-24.072S406.408,190.192,406.408,203.486Z" transform="translate(-266.254 -179.413)" fill="#87594a"/>
+    <path id="Path_70530" data-name="Path 70530" d="M383.148,190.554a8.746,8.746,0,1,1-8.748-8.745A8.746,8.746,0,0,1,383.148,190.554Z" transform="translate(-257.526 -175.812)" fill="#fff"/>
+  </g>
+</svg>

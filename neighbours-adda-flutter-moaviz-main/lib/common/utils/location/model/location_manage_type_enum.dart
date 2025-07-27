@@ -1,0 +1,1 @@
+enum LocationManageType { setting, favorite }

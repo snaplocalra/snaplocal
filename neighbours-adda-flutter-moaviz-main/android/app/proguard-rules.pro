@@ -1,0 +1,4 @@
+-keep class io.flutter.** { *; }
+-keep class io.flutter.plugins.** { *; }
+-keep class com.na.snaplocal.** { *; }
+-dontwarn io.flutter.embedding.**

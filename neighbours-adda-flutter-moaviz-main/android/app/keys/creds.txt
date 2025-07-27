@@ -1,0 +1,6 @@
+key.properties creds
+
+storePassword=Colourmoon@2008
+keyPassword=Colourmoon@2008
+keyAlias=upload
+storeFile={{project path}}

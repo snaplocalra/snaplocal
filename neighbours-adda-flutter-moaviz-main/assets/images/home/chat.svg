@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <g id="chat" transform="translate(-852 -976)">
+    <rect id="Rectangle_11705" data-name="Rectangle 11705" width="32" height="32" transform="translate(852 976)" fill="none"/>
+    <g id="Group_59975" data-name="Group 59975" transform="translate(503.354 935.423)">
+      <g id="comment" transform="translate(354.646 46.567)">
+        <path id="Path_67852" data-name="Path 67852" d="M20,9.368a10.01,10.01,0,1,0-9.985,10.627h5.819A4.171,4.171,0,0,0,20,15.829Zm-1.667,6.461a2.5,2.5,0,0,1-2.5,2.5H10.013a8.367,8.367,0,0,1-6.23-2.786A8.264,8.264,0,0,1,1.721,9.031a8.369,8.369,0,0,1,7.213-7.3,8.8,8.8,0,0,1,1.083-.068,8.267,8.267,0,0,1,5.316,1.917,8.367,8.367,0,0,1,3,5.868Z" transform="translate(0.001 0.024)" fill="#001968"/>
+        <path id="Path_67853" data-name="Path 67853" d="M7.833,8.667h3.333a.833.833,0,0,0,0-1.667H7.833a.833.833,0,0,0,0,1.667Z" transform="translate(-1.166 -1.147)" fill="#001968"/>
+        <path id="Path_67854" data-name="Path 67854" d="M14.5,11H7.833a.833.833,0,1,0,0,1.667H14.5A.833.833,0,1,0,14.5,11Z" transform="translate(-1.166 -1.814)" fill="#001968"/>
+        <path id="Path_67855" data-name="Path 67855" d="M14.5,15H7.833a.833.833,0,1,0,0,1.667H14.5A.833.833,0,1,0,14.5,15Z" transform="translate(-1.166 -2.48)" fill="#001968"/>
+      </g>
+    </g>
+  </g>
+</svg>

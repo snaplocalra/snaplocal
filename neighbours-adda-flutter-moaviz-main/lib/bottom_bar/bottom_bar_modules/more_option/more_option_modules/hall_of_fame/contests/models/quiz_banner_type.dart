@@ -1,0 +1,1 @@
+enum QuizBannerType { contests, winners }
