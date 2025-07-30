@@ -128,6 +128,7 @@ import 'package:snap_local/utility/push_notification/firebase_messaging_service/
 import 'package:snap_local/utility/router/go_routes.dart';
 import 'package:snap_local/utility/session_checker/logic/cubit/session_checker_cubit.dart';
 import 'package:snap_local/utility/session_checker/repository/session_checker_repository.dart';
+import 'package:snap_local/utility/storage/cache/logic/cache_cubit.dart';
 
 import 'common/social_media/post/video_feed/repository/video_data_repository.dart';
 import 'profile/profile_settings/logic/remove_account/remove_account_cubit.dart';
@@ -197,6 +198,10 @@ Future<void> main() async {
   //Initialize the flutter downloader
   await FlutterDownloader.initialize();
 
+  //Initialize cache system
+  final cacheCubit = CacheCubit();
+  await cacheCubit.initializeCache();
+
   if (!kIsWeb) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -217,13 +222,14 @@ Future<void> main() async {
       path: 'assets/translations',
       assetLoader: const CodegenLoader(),
       fallbackLocale: LocaleManager.english,
-      child: ShowCaseWidget(builder: (context) => const MyApp()),
+      child: ShowCaseWidget(builder: (context) => MyApp(cacheCubit: cacheCubit)),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final CacheCubit cacheCubit;
+  const MyApp({super.key, required this.cacheCubit});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -339,6 +345,9 @@ class _MyAppState extends State<MyApp> {
       ],
       child: MultiBlocProvider(
         providers: [
+          // Add cache cubit near the top
+          BlocProvider.value(value: widget.cacheCubit),
+          
           BlocProvider(create: (context) => SplashControllerCubit()),
           BlocProvider(
             create: (context) => LanguageKnownCubit(

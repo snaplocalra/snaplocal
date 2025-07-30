@@ -6,8 +6,10 @@ import 'package:snap_local/common/utils/widgets/media_handing_widget/video_full_
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:http/http.dart' as http;
+import 'dart:io';
 
 import '../../../social_media/post/post_details/logic/post_details_controller/post_details_controller_cubit.dart';
+import '../../../../utility/storage/cache/manager/media_cache_manager.dart';
 import 'logic/video_player_manager.dart';
 
 class BaseVideoVisibilityWidget extends StatefulWidget {
@@ -41,15 +43,98 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
   bool _hasError = false;
   bool _isMuted = true;
   bool _hasReportedView = false;
-  String views="0";
+  String views = "0";
+  File? _cachedVideoFile;
+  bool _isCachedVideoUsable = false;
 
   @override
   void initState() {
     super.initState();
-    views=widget.views;
+    views = widget.views;
     _isMuted = VideoMuteManager().isMuted;
     VideoMuteManager().addListener(_handleGlobalMuteChange);
     WidgetsBinding.instance.addObserver(this);
+    
+    // Preload video when widget is created
+    _preloadVideo();
+  }
+
+  Future<void> _preloadVideo() async {
+    try {
+      print('🎥 [VIDEO] Preloading video: ${widget.videoUrl.substring(0, 50)}...');
+      // Check if video is already cached
+      _cachedVideoFile = await MediaCacheManager.instance.getCachedFile(widget.videoUrl);
+      
+      if (_cachedVideoFile == null) {
+        print('🎥 [VIDEO] No cached file found, starting download...');
+        // Start downloading in background
+        MediaCacheManager.instance.downloadAndCache(
+          widget.videoUrl,
+          thumbnailUrl: widget.thumbnailUrl,
+        ).then((file) async {
+          if (mounted && file != null) {
+            final isUsable = await _validateCachedVideo(file);
+            print('🎥 [VIDEO] Download completed, video usable: $isUsable');
+            setState(() {
+              _cachedVideoFile = file;
+              _isCachedVideoUsable = isUsable;
+            });
+          }
+        }).catchError((e) {
+          print('🎥 [VIDEO] Error caching video: $e');
+        });
+      } else {
+        print('🎥 [VIDEO] Found cached file, validating...');
+        final isUsable = await _validateCachedVideo(_cachedVideoFile!);
+        print('🎥 [VIDEO] Using cached file, usable: $isUsable');
+        setState(() {
+          _isCachedVideoUsable = isUsable;
+        });
+      }
+    } catch (e) {
+      print('🎥 [VIDEO] Error preloading video: $e');
+    }
+  }
+
+  Future<bool> _validateCachedVideo(File videoFile) async {
+    try {
+      // Check if file exists and has sufficient size
+      if (!await videoFile.exists()) {
+        print('🎥 [VALIDATE] Video file does not exist');
+        return false;
+      }
+
+      final fileSize = await videoFile.length();
+      const minCacheSize = 1024 * 1024; // 1MB minimum
+      
+      if (fileSize < minCacheSize) {
+        print('🎥 [VALIDATE] Video file too small: ${fileSize} bytes');
+        return false;
+      }
+
+      // Try to create a video controller to validate the file is playable
+      try {
+        final testController = VideoPlayerController.file(videoFile);
+        await testController.initialize();
+        final duration = testController.value.duration;
+        await testController.dispose();
+        
+        // Check if video has reasonable duration (at least 1 second)
+        if (duration.inMilliseconds < 1000) {
+          print('🎥 [VALIDATE] Video duration too short: ${duration.inMilliseconds}ms');
+          return false;
+        }
+        
+        print('🎥 [VALIDATE] Video file is valid - Size: ${(fileSize / (1024 * 1024)).toStringAsFixed(2)}MB, Duration: ${duration.inSeconds}s');
+        return true;
+      } catch (e) {
+        print('🎥 [VALIDATE] Video file validation failed: $e');
+        return false;
+      }
+    } catch (e) {
+      print('🎥 [VALIDATE] Error validating video file: $e');
+      return false;
+    }
   }
 
   @override
@@ -80,10 +165,24 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
     });
 
     try {
-      final controller = await VideoControllerManager().getController(widget.videoUrl, _isMuted);
+      VideoPlayerController controller;
+      
+      // Use cached file only if it's usable, otherwise use network
+      if (_cachedVideoFile != null && _isCachedVideoUsable) {
+        print('🎥 [CONTROLLER] Using validated cached file for video controller');
+        controller = VideoPlayerController.file(_cachedVideoFile!);
+      } else {
+        print('🎥 [CONTROLLER] Using network URL for video controller (cache not ready or unusable)');
+        controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+      }
+
+      print('🎥 [CONTROLLER] Initializing video controller...');
+      await controller.initialize();
+      controller.setVolume(_isMuted ? 0.0 : 1.0);
 
       if (!mounted) return;
 
+      print('🎥 [CONTROLLER] Video controller initialized successfully');
       setState(() {
         _controller = controller;
         _hasError = false;
@@ -94,7 +193,9 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
 
       VideoControllerManager().pauseAllExcept(widget.videoUrl);
       controller.play();
-    } catch (_) {
+      print('🎥 [CONTROLLER] Started playing video');
+    } catch (e) {
+      print('🎥 [CONTROLLER] Error initializing video controller: $e');
       if (mounted) setState(() => _hasError = true);
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -106,44 +207,11 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
       final position = _controller!.value.position;
       if (position.inSeconds >= 3) {
         _hasReportedView = true;
-        // if(int.tryParse(views)!=null){
-        //   views=(int.tryParse(views)!+1).toString();
-        // }
-        //_reportVideoView();
-        //views="10";
-
         setState(() {});
-        if(widget.onVideoViewCount!=null) {
+        if (widget.onVideoViewCount != null) {
           widget.onVideoViewCount!();
         }
       }
-    }
-  }
-
-  Future<void> _reportVideoView() async {
-    try {
-
-      // context
-      //     .read<PostDetailsControllerCubit>()
-      //     .postStateUpdate();
-      // // Replace the URL and body with your actual API
-      // const String endpoint = "https://your-api.com/video/view";
-      // final response = await http.post(
-      //   Uri.parse(endpoint),
-      //   headers: {
-      //     "Authorization": "Bearer YOUR_ACCESS_TOKEN",
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: '{"video_url": "${widget.videoUrl}"}',
-      // );
-      //
-      // if (response.statusCode == 200) {
-      //   debugPrint("View count reported successfully.");
-      // } else {
-      //   debugPrint("Failed to report view. Status: ${response.statusCode}");
-      // }
-    } catch (e) {
-      debugPrint("Error reporting view: $e");
     }
   }
 
@@ -151,15 +219,18 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
     final visible = info.visibleFraction > 0.6;
 
     if (visible && !_isVisible) {
+      print('🎥 [VISIBILITY] Video became visible, initializing...');
       _isVisible = true;
 
       if (!_isUsableController(_controller)) {
         await _initializeController();
       } else {
+        print('🎥 [VISIBILITY] Reusing existing controller');
         VideoControllerManager().pauseAllExcept(widget.videoUrl);
         _controller?.play();
       }
     } else if (!visible && _isVisible) {
+      print('🎥 [VISIBILITY] Video became invisible, pausing...');
       _isVisible = false;
       try {
         _controller?.pause();
@@ -173,13 +244,6 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
         !c.value.hasError &&
         c.value.isPlaying != null;
   }
-
-  // void _toggleMute() {
-  //   setState(() {
-  //     _isMuted = !_isMuted;
-  //     _controller?.setVolume(_isMuted ? 0.0 : 1.0);
-  //   });
-  // }
 
   void _handleGlobalMuteChange(bool mute) {
     if (mounted) {
@@ -202,7 +266,6 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
       });
     }
   }
-
 
   void _openFullScreen() {
     if (_isUsableController(_controller)) {
@@ -235,6 +298,105 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
               ),
             if (_isLoading)
               const Center(child: CircularProgressIndicator()),
+            // Show cache status indicator only when video is actually cached and usable
+            if (_cachedVideoFile != null && _isCachedVideoUsable && !_isLoading)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.offline_bolt,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        'CACHED',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            // Show network indicator when using network or cache is not ready
+            if ((!_isCachedVideoUsable || _cachedVideoFile == null) && usable)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.cloud_download,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        'NETWORK',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            // Show downloading indicator when cache is in progress
+            if (_cachedVideoFile == null && _isLoading)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'LOADING',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             if (usable && widget.showControls) ...[
               Positioned(
                 top: 10,
