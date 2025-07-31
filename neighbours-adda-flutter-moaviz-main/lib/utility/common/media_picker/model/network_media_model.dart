@@ -4,6 +4,10 @@ abstract class NetworkMediaModel {
   String get thumbnail;
   String get views;
 
+  // Add these getters for compatibility
+  String get mediaType;
+  String get mediaPath;
+
   //FromMap
   factory NetworkMediaModel.fromMap(Map<String, dynamic> json) {
     switch (json["media_type"]) {
@@ -32,6 +36,12 @@ class NetworkImageMediaModel implements NetworkMediaModel {
   String get thumbnail => imageUrl;
   @override
   String get views => "";
+
+  @override
+  String get mediaType => "image";
+
+  @override
+  String get mediaPath => imageUrl;
 
   //ToMap
   @override
@@ -67,6 +77,12 @@ class NetworkVideoMediaModel implements NetworkMediaModel {
   String get thumbnail => thumbnailUrl;
   @override
   String get views => viewCount;
+
+  @override
+  String get mediaType => "video";
+
+  @override
+  String get mediaPath => videoUrl;
 
   //ToMap
   @override

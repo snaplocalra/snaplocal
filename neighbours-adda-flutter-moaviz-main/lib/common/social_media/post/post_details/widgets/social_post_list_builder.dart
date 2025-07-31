@@ -34,6 +34,7 @@ import 'package:snap_local/common/utils/report/logic/report/report_cubit.dart';
 import 'package:snap_local/common/utils/report/repository/report_repository.dart';
 import 'package:snap_local/utility/tools/theme_divider.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:snap_local/utility/storage/cache/logic/cache_cubit.dart';
 
 class SocialPostListBuilder extends StatefulWidget {
   const SocialPostListBuilder({
@@ -129,6 +130,31 @@ class _SocialPostListBuilderState extends State<SocialPostListBuilder> {
     if (widget.hideBottomBarOnScroll) {
       //Manage the bottom bar visibility on scroll
       ManageBottomBarVisibilityOnScroll(context).init(widget.scrollController);
+    }
+
+    // Add scroll listener for video preloading
+    widget.scrollController?.addListener(_onScrollForVideoPreload);
+  }
+
+  void _onScrollForVideoPreload() {
+    if (widget.scrollController == null) return;
+    final position = widget.scrollController!.position;
+    final firstVisible = (position.pixels / 300).floor(); // Approximate item height
+    final lastVisible = ((position.pixels + position.viewportDimension) / 300).ceil();
+    final nextVideos = logs.skip(lastVisible).take(3).toList();
+    final urlToThumbnailMap = <String, String?>{};
+    for (final post in nextVideos) {
+      if (post.media != null && post.media.isNotEmpty) {
+        for (final media in post.media) {
+          // Use mediaType and thumbnail (not thumbnailUrl)
+          if (media.mediaType == 'video' && media.mediaPath.isNotEmpty) {
+            urlToThumbnailMap[media.mediaPath] = media.thumbnail;
+          }
+        }
+      }
+    }
+    if (urlToThumbnailMap.isNotEmpty) {
+      context.read<CacheCubit>().preloadUrls(urlToThumbnailMap);
     }
   }
 

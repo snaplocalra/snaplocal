@@ -6,6 +6,7 @@ class CacheState extends Equatable {
   final bool isClearingCache;
   final Map<String, dynamic> cacheStats;
   final String? error;
+  final Set<String> preloadingUrls;
 
   const CacheState({
     this.isInitialized = false,
@@ -13,6 +14,7 @@ class CacheState extends Equatable {
     this.isClearingCache = false,
     this.cacheStats = const {},
     this.error,
+    this.preloadingUrls = const {},
   });
 
   @override
@@ -22,6 +24,7 @@ class CacheState extends Equatable {
         isClearingCache,
         cacheStats,
         error,
+        preloadingUrls,
       ];
 
   CacheState copyWith({
@@ -30,6 +33,7 @@ class CacheState extends Equatable {
     bool? isClearingCache,
     Map<String, dynamic>? cacheStats,
     String? error,
+    Set<String>? preloadingUrls,
   }) {
     return CacheState(
       isInitialized: isInitialized ?? this.isInitialized,
@@ -37,6 +41,7 @@ class CacheState extends Equatable {
       isClearingCache: isClearingCache ?? this.isClearingCache,
       cacheStats: cacheStats ?? this.cacheStats,
       error: error,
+      preloadingUrls: preloadingUrls ?? this.preloadingUrls,
     );
   }
 }

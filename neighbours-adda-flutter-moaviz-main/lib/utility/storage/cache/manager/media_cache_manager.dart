@@ -15,9 +15,10 @@ class MediaCacheManager {
   final Dio _dio = Dio();
   late Directory _cacheDirectory;
   bool _initialized = false;
+  final Set<String> _downloadingUrls = {};
 
   // Cache size limits
-  static const int maxCacheSizeBytes = 500 * 1024 * 1024; // 500MB
+  static const int maxCacheSizeBytes = 1024 * 1024 * 1024; // 1GB
   static const int maxCacheFiles = 1000;
 
   Future<void> initialize() async {
@@ -97,16 +98,23 @@ class MediaCacheManager {
     return null;
   }
 
-  Future<File?> downloadAndCache(String url, {String? thumbnailUrl}) async {
+  Future<File?> downloadAndCache(String url, {String? thumbnailUrl, Function(String)? onDone, Function(String, dynamic)? onError}) async {
     await initialize();
+    
+    if (_downloadingUrls.contains(url)) {
+      print('🟠 [DOWNLOAD] Already downloading: ${url.substring(0, 50)}...');
+      return null;
+    }
     
     print('⬇️ [DOWNLOAD] Starting download for URL: ${url.substring(0, 50)}...');
     
     try {
+      _downloadingUrls.add(url);
       // Check if already cached and viable
       final existingFile = await getCachedFile(url);
       if (existingFile != null) {
         print('✅ [DOWNLOAD] File already cached and viable, returning existing file');
+        onDone?.call(url);
         return existingFile;
       }
 
@@ -177,12 +185,17 @@ class MediaCacheManager {
 
         await CacheDatabase.insertCachedMedia(cachedMedia);
         print('💾 [DATABASE] Saved cache entry to database');
+        onDone?.call(url);
         return file;
       } else {
         print('❌ [DOWNLOAD] Failed with status code: ${response.statusCode}');
+        onError?.call(url, 'Failed with status code: ${response.statusCode}');
       }
     } catch (e) {
       print('❌ [DOWNLOAD] Error downloading and caching media: $e');
+      onError?.call(url, e);
+    } finally {
+      _downloadingUrls.remove(url);
     }
     
     return null;
@@ -302,21 +315,31 @@ class MediaCacheManager {
   }
 
   // Preload media for upcoming posts
-  Future<void> preloadMedia(List<String> urls) async {
-    print('🚀 [PRELOAD] Starting preload for ${urls.length} URLs');
-    for (final url in urls) {
+  Future<void> preloadMedia(Map<String, String?> urlToThumbnailMap, {Function(String)? onStart, Function(String)? onDone, Function(String, dynamic)? onError}) async {
+    print('🚀 [PRELOAD] Starting preload for ${urlToThumbnailMap.length} URLs');
+    for (final entry in urlToThumbnailMap.entries) {
+      final url = entry.key;
+      final thumbnailUrl = entry.value;
       if (url.isNotEmpty) {
-        print('🚀 [PRELOAD] Preloading: ${url.substring(0, 50)}...');
-        // Run in background without waiting
-        downloadAndCache(url).then((file) {
-          if (file != null) {
-            print('✅ [PRELOAD] Successfully preloaded: ${url.substring(0, 50)}...');
-          } else {
-            print('❌ [PRELOAD] Failed to preload: ${url.substring(0, 50)}...');
-          }
-        }).catchError((e) {
-          print('❌ [PRELOAD] Error preloading media: $e');
-        });
+        // Check if already cached or currently downloading
+        final cachedFile = await getCachedFile(url);
+        if (cachedFile == null && !_downloadingUrls.contains(url)) {
+          print('🚀 [PRELOAD] Preloading: ${url.substring(0, 50)}...');
+          onStart?.call(url);
+          // Run in background without waiting
+          downloadAndCache(url, thumbnailUrl: thumbnailUrl, onDone: onDone, onError: onError).then((file) {
+            if (file != null) {
+              print('✅ [PRELOAD] Successfully preloaded: ${url.substring(0, 50)}...');
+            } else {
+              print('ⓘ [PRELOAD] Finished preload attempt for: ${url.substring(0, 50)}...');
+            }
+          }).catchError((e) {
+            print('❌ [PRELOAD] Error preloading media: $e');
+            onError?.call(url, e);
+          });
+        } else {
+          print('ⓘ [PRELOAD] Skipping already cached or downloading URL: ${url.substring(0, 50)}...');
+        }
       }
     }
   }

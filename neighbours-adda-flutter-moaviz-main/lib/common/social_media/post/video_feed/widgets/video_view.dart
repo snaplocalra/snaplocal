@@ -47,6 +47,7 @@ import '../../post_details/widgets/post_view/circular_counter.dart';
 import '../../shared_social_post/model/share_post_data_model.dart';
 import '../../shared_social_post/screen/share_post_details_screen.dart';
 import 'comment_sheet.dart';
+import 'package:snap_local/utility/storage/cache/manager/media_cache_manager.dart';
 
 class VideoPlayerItem extends StatefulWidget {
   final void Function() onProfileTap;
@@ -83,18 +84,28 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
     // Ensure all videos start muted initially
     _localMuted = _globalMuted;
 
-    _controller = VideoPlayerController.networkUrl(
-      Uri.parse(widget.mediaUrl),
-    )..initialize().then((_) {
-      setState(() {
-        _isInitialized = true;
-        _isPlaying = true;
-      });
-      _controller.play();
-      _controller.setLooping(true);
-      _controller.setVolume(_localMuted ? 0 : 1);
-      _controller.addListener(_videoProgressListener); // Start view check
+    _initializeVideo();
+  }
+
+  Future<void> _initializeVideo() async {
+    // Try to get cached file first
+    final cachedFile = await MediaCacheManager.instance.getCachedFile(widget.mediaUrl);
+    if (cachedFile != null) {
+      _controller = VideoPlayerController.file(cachedFile);
+    } else {
+      _controller = VideoPlayerController.networkUrl(Uri.parse(widget.mediaUrl));
+      // Start background caching for next time
+      MediaCacheManager.instance.downloadAndCache(widget.mediaUrl);
+    }
+    await _controller.initialize();
+    setState(() {
+      _isInitialized = true;
+      _isPlaying = true;
     });
+    _controller.play();
+    _controller.setLooping(true);
+    _controller.setVolume(_localMuted ? 0 : 1);
+    _controller.addListener(_videoProgressListener); // Start view check
   }
 
   void _videoProgressListener() {

@@ -70,20 +70,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Add method to preload media from posts
   void _preloadPostMedia(List<dynamic> posts) {
-    final videoUrls = <String>[];
+    final urlToThumbnailMap = <String, String?>{};
 
     for (final post in posts) {
       if (post.media != null && post.media.isNotEmpty) {
         for (final media in post.media) {
           if (media.mediaType == 'video' && media.mediaUrl.isNotEmpty) {
-            videoUrls.add(media.mediaUrl);
+            urlToThumbnailMap[media.mediaUrl] = media.thumbnailUrl;
           }
         }
       }
     }
 
-    if (videoUrls.isNotEmpty) {
-      context.read<CacheCubit>().preloadUrls(videoUrls);
+    if (urlToThumbnailMap.isNotEmpty) {
+      context.read<CacheCubit>().preloadUrls(urlToThumbnailMap);
     }
   }
 

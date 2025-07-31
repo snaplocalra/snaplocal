@@ -4,6 +4,9 @@ import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:snap_local/common/social_media/post/master_post/model/social_post_model.dart';
 import 'package:snap_local/utility/api_manager/pagination/models/pagination_model.dart';
+import 'package:snap_local/utility/storage/cache/logic/cache_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
 import '../../repository/video_data_repository.dart';
 
@@ -25,7 +28,7 @@ class VideoSocialPostsCubit extends Cubit<VideoSocialPostsState>
           ),
         );
 
-  Future<void> fetchVideoPosts({bool loadMoreData = false}) async {
+  Future<void> fetchVideoPosts({bool loadMoreData = false, BuildContext? context}) async {
     try {
       //emit loading if the feed post list is empty
       if (state.error != null || state.feedPosts.socialPostList.isEmpty) {
@@ -47,6 +50,7 @@ class VideoSocialPostsCubit extends Cubit<VideoSocialPostsState>
           emit(state.copyWith(
             feedPosts: state.feedPosts.paginationCopyWith(newData: feedPosts),
           ));
+          _preloadUpcomingVideos(context, state.feedPosts.socialPostList);
         } else {
           //Existing state emit
           emit(state.copyWith());
@@ -55,6 +59,7 @@ class VideoSocialPostsCubit extends Cubit<VideoSocialPostsState>
         feedPosts = await videoDataRepository.fetchVideoPosts(page: 1);
         //Emit the new state if it is the initial load request
         emit(state.copyWith(feedPosts: feedPosts));
+        _preloadUpcomingVideos(context, feedPosts.socialPostList);
       }
       return;
     } catch (e) {
@@ -72,6 +77,24 @@ class VideoSocialPostsCubit extends Cubit<VideoSocialPostsState>
         emit(state.copyWith());
         return;
       }
+    }
+  }
+
+  void _preloadUpcomingVideos(BuildContext? context, List<SocialPostModel> posts) {
+    if (context == null) return;
+    final urlToThumbnailMap = <String, String?>{};
+    for (final post in posts) {
+      if (post.media != null && post.media.isNotEmpty) {
+        for (final media in post.media) {
+          // Use mediaType and thumbnail (not thumbnailUrl)
+          if (media.mediaType == 'video' && media.mediaPath.isNotEmpty) {
+            urlToThumbnailMap[media.mediaPath] = media.thumbnail;
+          }
+        }
+      }
+    }
+    if (urlToThumbnailMap.isNotEmpty) {
+      context.read<CacheCubit>().preloadUrls(urlToThumbnailMap);
     }
   }
 
