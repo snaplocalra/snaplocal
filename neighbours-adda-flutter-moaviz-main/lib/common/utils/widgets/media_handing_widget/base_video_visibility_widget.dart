@@ -55,8 +55,21 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
     VideoMuteManager().addListener(_handleGlobalMuteChange);
     WidgetsBinding.instance.addObserver(this);
     
-    // Preload video when widget is created
-    _preloadVideo();
+    // Check for cached file on init to prevent loading flicker
+    _checkCacheOnInit();
+  }
+
+  Future<void> _checkCacheOnInit() async {
+    final file = await MediaCacheManager.instance.getCachedFile(widget.videoUrl);
+    if (file != null) {
+      final isUsable = await _validateCachedVideo(file);
+      if (mounted && isUsable) {
+        setState(() {
+          _cachedVideoFile = file;
+          _isCachedVideoUsable = true;
+        });
+      }
+    }
   }
 
   Future<void> _preloadVideo() async {
@@ -167,9 +180,18 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
     try {
       VideoPlayerController controller;
       
+      // Check for cached file first
+      _cachedVideoFile = await MediaCacheManager.instance.getCachedFile(widget.videoUrl);
+      _isCachedVideoUsable = _cachedVideoFile != null && await _validateCachedVideo(_cachedVideoFile!);
+
       // Use cached file only if it's usable, otherwise use network
       if (_cachedVideoFile != null && _isCachedVideoUsable) {
         print('🎥 [CONTROLLER] Using validated cached file for video controller');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
         controller = VideoPlayerController.file(_cachedVideoFile!);
       } else {
         print('🎥 [CONTROLLER] Using network URL for video controller (cache not ready or unusable)');
@@ -278,6 +300,7 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
   @override
   Widget build(BuildContext context) {
     final usable = _isUsableController(_controller);
+    final showLoading = _isLoading && !_isCachedVideoUsable;
 
     return VisibilityDetector(
       key: Key(widget.videoUrl),
@@ -296,7 +319,7 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
                 fit: BoxFit.cover,
                 errorWidget: (context, _, __) => const Icon(Icons.error),
               ),
-            if (_isLoading)
+            if (showLoading)
               const Center(child: CircularProgressIndicator()),
             // Show cache status indicator only when video is actually cached and usable
             if (_cachedVideoFile != null && _isCachedVideoUsable && !_isLoading)
@@ -320,38 +343,6 @@ class _BaseVideoVisibilityWidgetState extends State<BaseVideoVisibilityWidget> w
                       const SizedBox(width: 2),
                       Text(
                         'CACHED',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            // Show network indicator when using network or cache is not ready
-            if ((!_isCachedVideoUsable || _cachedVideoFile == null) && usable)
-              Positioned(
-                top: 10,
-                right: 10,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.cloud_download,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        'NETWORK',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 10,

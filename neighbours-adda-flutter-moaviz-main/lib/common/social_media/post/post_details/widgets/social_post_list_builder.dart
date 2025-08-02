@@ -131,30 +131,26 @@ class _SocialPostListBuilderState extends State<SocialPostListBuilder> {
       //Manage the bottom bar visibility on scroll
       ManageBottomBarVisibilityOnScroll(context).init(widget.scrollController);
     }
-
-    // Add scroll listener for video preloading
-    widget.scrollController?.addListener(_onScrollForVideoPreload);
   }
 
-  void _onScrollForVideoPreload() {
-    if (widget.scrollController == null) return;
-    final position = widget.scrollController!.position;
-    final firstVisible = (position.pixels / 300).floor(); // Approximate item height
-    final lastVisible = ((position.pixels + position.viewportDimension) / 300).ceil();
-    final nextVideos = logs.skip(lastVisible).take(3).toList();
-    final urlToThumbnailMap = <String, String?>{};
-    for (final post in nextVideos) {
-      if (post.media != null && post.media.isNotEmpty) {
-        for (final media in post.media) {
-          // Use mediaType and thumbnail (not thumbnailUrl)
-          if (media.mediaType == 'video' && media.mediaPath.isNotEmpty) {
-            urlToThumbnailMap[media.mediaPath] = media.thumbnail;
+  void _preloadNextVideos(int currentIndex) {
+    final urlsToPreload = <String, String?>{};
+    // Preload next 3 videos
+    for (int i = 1; i <= 3; i++) {
+      final nextIndex = currentIndex + i;
+      if (nextIndex < logs.length) {
+        final post = logs[nextIndex];
+        if (post.media.isNotEmpty && post.media.first.mediaType == 'video') {
+          final url = post.media.first.mediaUrl;
+          final thumbnail = post.media.first.thumbnail;
+          if (url.isNotEmpty) {
+            urlsToPreload[url] = thumbnail;
           }
         }
       }
     }
-    if (urlToThumbnailMap.isNotEmpty) {
-      context.read<CacheCubit>().preloadUrls(urlToThumbnailMap);
+    if (urlsToPreload.isNotEmpty) {
+      context.read<CacheCubit>().preloadUrls(urlsToPreload);
     }
   }
 
@@ -410,6 +406,9 @@ class _SocialPostListBuilderState extends State<SocialPostListBuilder> {
             itemCount: paginationEnabled ? logs.length + 1 : logs.length,
             itemBuilder: (context, index) {
               if (!paginationEnabled || index < logs.length) {
+                // Trigger preloading for next videos
+                _preloadNextVideos(index);
+
                 //Post details
                 final postDetails = logs[index];
 
