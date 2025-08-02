@@ -75,8 +75,12 @@ class _HomeScreenState extends State<HomeScreen> {
     for (final post in posts) {
       if (post.media != null && post.media.isNotEmpty) {
         for (final media in post.media) {
-          if (media.mediaType == 'video' && media.mediaUrl.isNotEmpty) {
-            urlToThumbnailMap[media.mediaUrl] = media.thumbnailUrl;
+          if (media.mediaUrl != null && media.mediaUrl.isNotEmpty) {
+            if (media.mediaType == 'video') {
+              urlToThumbnailMap[media.mediaUrl] = media.thumbnail;
+            } else {
+              urlToThumbnailMap[media.mediaUrl] = null; // For other media types
+            }
           }
         }
       }
@@ -231,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           BlocBuilder<CacheCubit, CacheState>(
                             builder: (context, cacheState) {
                               if (cacheState.cacheStats.isNotEmpty) {
-                                final usagePercentage = cacheState.cacheStats['usagePercentage'] as double;
+                                final usagePercentage = (cacheState.cacheStats['usagePercentage'] as num).toDouble();
                                 return Padding(
                                   padding: const EdgeInsets.only(right: 8.0),
                                   child: GestureDetector(
@@ -472,10 +476,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Text('Usage: ${stats['usagePercentage'].toStringAsFixed(1)}%'),
             const SizedBox(height: 10),
             LinearProgressIndicator(
-              value: stats['usagePercentage'] / 100,
+              value: (stats['usagePercentage'] as num) / 100,
               backgroundColor: Colors.grey[300],
               valueColor: AlwaysStoppedAnimation<Color>(
-                stats['usagePercentage'] > 80 ? Colors.red : Colors.blue,
+                (stats['usagePercentage'] as num) > 80 ? Colors.red : Colors.blue,
               ),
             ),
           ],

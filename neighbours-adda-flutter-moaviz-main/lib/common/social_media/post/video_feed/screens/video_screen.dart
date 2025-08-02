@@ -20,6 +20,7 @@ import 'package:snap_local/profile/manage_profile_details/logic/manage_profile_d
 import 'package:snap_local/profile/profile_settings/logic/profile_settings/profile_settings_cubit.dart';
 import 'package:snap_local/utility/localization/translation/locale_keys.g.dart';
 import 'package:snap_local/utility/localization/widget/localization_builder.dart';
+import 'package:snap_local/utility/storage/cache/logic/cache_cubit.dart';
 import 'package:snap_local/utility/tools/scroll_animate.dart';
 
 import '../../../../../bottom_bar/bottom_bar_modules/home/profile_fill_dialog/widget/show_profile_fill_dialog.dart';
@@ -51,6 +52,26 @@ class _VideoScreenState extends State<VideoScreen> {
 
   void _fetchVideoData() {
     context.read<VideoSocialPostsCubit>().fetchVideoPosts();
+  }
+
+  void _preloadNextVideos(int currentIndex) {
+    final posts = context.read<VideoSocialPostsCubit>().state.feedPosts.socialPostList;
+    final urlToThumbnailMap = <String, String?>{};
+
+    // Preload next 3 videos
+    for (int i = 1; i <= 3; i++) {
+      final nextIndex = currentIndex + i;
+      if (nextIndex < posts.length) {
+        final post = posts[nextIndex];
+        if (post.media.isNotEmpty && post.media.first.mediaType == 'video') {
+          urlToThumbnailMap[post.media.first.mediaUrl] = post.media.first.thumbnail;
+        }
+      }
+    }
+
+    if (urlToThumbnailMap.isNotEmpty) {
+      context.read<CacheCubit>().preloadUrls(urlToThumbnailMap);
+    }
   }
 
   @override
@@ -179,6 +200,9 @@ class _VideoScreenState extends State<VideoScreen> {
                     enableVisibilityPaginationDataCallBack: true,
                     visibilityDetectorKeyValue: "home-feed-post-pagination-loading-key",
                     socialPostsModel: videoPostsState.feedPosts,
+                    onPageChanged: (index) {
+                      _preloadNextVideos(index);
+                    },
                     // onCommentTap: (post) {
                     //   _openCommentsBottomSheet(
                     //     post: post,

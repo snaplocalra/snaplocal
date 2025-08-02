@@ -29,6 +29,7 @@ import '../../post_details/logic/comment_view_controller/comment_view_controller
 import '../../post_details/logic/post_details_controller/post_details_controller_cubit.dart';
 import '../../post_details/models/post_from_enum.dart';
 import '../../post_details/models/post_state_update/update_reaction_state.dart';
+import 'package:snap_local/utility/storage/cache/logic/cache_cubit.dart';
 
 
 class VideoPageViewBuilder extends StatefulWidget {
@@ -54,6 +55,7 @@ class VideoPageViewBuilder extends StatefulWidget {
     this.refreshParentData,
     this.hideBottomBarOnScroll = true,
     this.enableNewsPostAction = true,
+    this.onPageChanged,
     //required this.onCommentTap,
     //required this.onReact,
   });
@@ -70,6 +72,7 @@ class VideoPageViewBuilder extends StatefulWidget {
   final ScrollController? scrollController;
   final ScrollPhysics? physics;
   final int? index;
+  final void Function(int index)? onPageChanged;
 
   ///If true then onPaginationDataFetch will call if the bottom widget visible
   final bool enableVisibilityPaginationDataCallBack;
@@ -138,6 +141,27 @@ class _VideoPageViewBuilderState extends State<VideoPageViewBuilder> {
   //     );
   //   });
   // }
+
+  void _preloadNextVideo(int index) {
+    final urlsToPreload = <String, String?>{};
+    for (int i = 1; i <= 3; i++) {
+      final nextIndex = index + i;
+      if (nextIndex < logs.length) {
+        final nextPost = logs[nextIndex];
+        if (nextPost.media.isNotEmpty &&
+            nextPost.media.first.mediaType == 'video') {
+          final url = nextPost.media.first.mediaUrl;
+          final thumbnail = nextPost.media.first.thumbnail;
+          if (url.isNotEmpty) {
+            urlsToPreload[url] = thumbnail;
+          }
+        }
+      }
+    }
+    if (urlsToPreload.isNotEmpty) {
+      context.read<CacheCubit>().preloadUrls(urlsToPreload);
+    }
+  }
 
   Future<void> profileNavigation({
     required String userId,
@@ -213,7 +237,10 @@ class _VideoPageViewBuilderState extends State<VideoPageViewBuilder> {
       controller: _pageController,
       scrollDirection: Axis.vertical,
       itemCount: paginationEnabled ? logs.length + 1 : logs.length,
-      //onPageChanged: _onPageChanged,
+      onPageChanged: (index) {
+        widget.onPageChanged?.call(index);
+        _preloadNextVideo(index);
+      },
       itemBuilder: (context, index) {
         if (!paginationEnabled || index < logs.length) {
           //Post details
