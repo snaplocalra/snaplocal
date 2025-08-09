@@ -27,7 +27,7 @@ class _LocalVideosSectionState extends State<LocalVideosSection> {
   void initState() {
     super.initState();
     // Fetch local pages when widget initializes
-    context.read<VideoSocialPostsCubit>().fetchVideoPosts();
+    context.read<VideoSocialPostsCubit>().fetchVideoPosts(context: context);
   }
 
   Widget _buildShimmerItem() {

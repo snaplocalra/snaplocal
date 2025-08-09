@@ -119,6 +119,7 @@ dependencies:
   flutter_native_video_trimmer: ^1.1.9
   cached_video_player_plus: ^3.0.3
   showcaseview: ^4.0.1
+  workmanager: ^0.5.2
 
 
 

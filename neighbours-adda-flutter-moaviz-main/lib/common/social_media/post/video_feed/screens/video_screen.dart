@@ -51,7 +51,7 @@ class _VideoScreenState extends State<VideoScreen> {
   bool allowPagination = true;
 
   void _fetchVideoData() {
-    context.read<VideoSocialPostsCubit>().fetchVideoPosts();
+    context.read<VideoSocialPostsCubit>().fetchVideoPosts(context: context);
   }
 
   void _preloadNextVideos(int currentIndex) {
@@ -226,7 +226,7 @@ class _VideoScreenState extends State<VideoScreen> {
                     onPaginationDataFetch: () {
                       context
                           .read<VideoSocialPostsCubit>()
-                          .fetchVideoPosts(loadMoreData: true);
+                          .fetchVideoPosts(loadMoreData: true, context: context);
                     },
                   ),
                 );

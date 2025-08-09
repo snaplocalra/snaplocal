@@ -60,6 +60,11 @@ class VideoSocialPostsCubit extends Cubit<VideoSocialPostsState>
         //Emit the new state if it is the initial load request
         emit(state.copyWith(feedPosts: feedPosts));
         _preloadUpcomingVideos(context, feedPosts.socialPostList);
+        
+        // Trigger background cache for future use
+        if (context != null) {
+          context.read<CacheCubit>().triggerBackgroundCache();
+        }
       }
       return;
     } catch (e) {

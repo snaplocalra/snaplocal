@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../manager/media_cache_manager.dart';
+import '../manager/background_cache_service.dart';
 
 part 'cache_state.dart';
 
@@ -12,6 +13,7 @@ class CacheCubit extends Cubit<CacheState> {
     
     try {
       await MediaCacheManager.instance.initialize();
+      await BackgroundCacheService.initialize();
       final stats = await MediaCacheManager.instance.getCacheStats();
       
       emit(state.copyWith(
@@ -81,6 +83,16 @@ class CacheCubit extends Cubit<CacheState> {
       print('📱 [CACHE_CUBIT] Preload request sent successfully');
     } catch (e) {
       print('📱 [CACHE_CUBIT] Error in preload: $e');
+      emit(state.copyWith(error: e.toString()));
+    }
+  }
+
+  Future<void> triggerBackgroundCache() async {
+    try {
+      await BackgroundCacheService.triggerImmediateCache();
+      print('📱 [CACHE_CUBIT] Background cache triggered');
+    } catch (e) {
+      print('📱 [CACHE_CUBIT] Error triggering background cache: $e');
       emit(state.copyWith(error: e.toString()));
     }
   }

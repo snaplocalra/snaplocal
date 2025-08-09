@@ -7,6 +7,7 @@ class CacheState extends Equatable {
   final Map<String, dynamic> cacheStats;
   final String? error;
   final Set<String> preloadingUrls;
+  final bool isBackgroundCacheEnabled;
 
   const CacheState({
     this.isInitialized = false,
@@ -15,6 +16,7 @@ class CacheState extends Equatable {
     this.cacheStats = const {},
     this.error,
     this.preloadingUrls = const {},
+    this.isBackgroundCacheEnabled = true,
   });
 
   @override
@@ -25,6 +27,7 @@ class CacheState extends Equatable {
         cacheStats,
         error,
         preloadingUrls,
+        isBackgroundCacheEnabled,
       ];
 
   CacheState copyWith({
@@ -34,6 +37,7 @@ class CacheState extends Equatable {
     Map<String, dynamic>? cacheStats,
     String? error,
     Set<String>? preloadingUrls,
+    bool? isBackgroundCacheEnabled,
   }) {
     return CacheState(
       isInitialized: isInitialized ?? this.isInitialized,
@@ -42,6 +46,7 @@ class CacheState extends Equatable {
       cacheStats: cacheStats ?? this.cacheStats,
       error: error,
       preloadingUrls: preloadingUrls ?? this.preloadingUrls,
+      isBackgroundCacheEnabled: isBackgroundCacheEnabled ?? this.isBackgroundCacheEnabled,
     );
   }
 }
